@@ -30,7 +30,7 @@ pipeline {
             steps {
                 script {
                     // run server for develop
-                    bat "npm run start"
+                    bat "npm run build"
                 }
             }
         }
