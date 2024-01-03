@@ -80,7 +80,6 @@ const TSA_Contrl = {
         next(createError.InternalServerError(error.message));
       }
     } else {
-      console.log("Av");
       next(createError.NotFound(`File not found: ${fileName}`));
     }
   },
@@ -122,14 +121,12 @@ const TSA_Contrl = {
             resForm.successRes(res, resData);
           })
           .on("error", (error) => {
-            console.log(error, "error");
             next(createError.Conflict(error.message));
           });
       } catch (error) {
         next(createError.InternalServerError(error.message));
       }
     } else {
-      console.log("Av");
       next(createError.NotFound(`File not found: ${fileName}`));
     }
   },
@@ -162,14 +159,12 @@ const TSA_Contrl = {
             resForm.successRes(res, resData);
           })
           .on("error", (error) => {
-            console.log(error, "error");
             next(createError.Conflict(error.message));
           });
       } catch (error) {
         next(createError.InternalServerError(error.message));
       }
     } else {
-      console.log("Av");
       next(createError.NotFound(`File not found: ${fileName}`));
     }
   },
