@@ -16,6 +16,17 @@ pipeline {
             }
         }
 
+        stage('clear dsa_service') {
+            steps {
+                script {
+                    
+                    // install dependencies using npm
+                    bat "pm2 delete dsa_service"
+                }
+            }
+        }
+
+
         stage('Install Dependencies') {
             steps {
                 script {
@@ -30,7 +41,7 @@ pipeline {
             steps {
                 script {
                     // run server for develop
-                    bat "npm run build"
+                    bat "pm2 start server.js"
                 }
             }
         }
