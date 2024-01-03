@@ -11,7 +11,9 @@ const DSA_Contrl = {
   },
   detailSubs: async (req, res, next) => {
     const csvFilePath = "File/mp_sub.csv";
-
+    if (!fs.existsSync(csvFilePath)) {
+      return next(createError.NotFound("File not found"));
+    }
     const resData = {
       sub500kV: [],
       sub345kV: [],
@@ -70,6 +72,9 @@ const DSA_Contrl = {
   detailLines: async (req, res, next) => {
     const csvFilePath = "File/mp_line.csv";
 
+    if (!fs.existsSync(csvFilePath)) {
+      return next(createError.NotFound("File not found"));
+    }
     const resData = {
       line500kV: [],
       line345kV: [],
@@ -116,6 +121,41 @@ const DSA_Contrl = {
               resData.line20kV.push(dataLine);
               break;
           }
+        })
+        .on("end", () => {
+          resForm.successRes(res, resData);
+        })
+        .on("error", (error) => {
+          next(createError.Conflict(error.message));
+        });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  infoSub: async (req, res, next) => {
+    const csvFilePath = "File/Radarchart.csv";
+    if (!fs.existsSync(csvFilePath)) {
+      return next(createError.NotFound("File not found"));
+    }
+    const resData = {
+      Key: [],
+      Rate1: [],
+      Rate2: [],
+      Rate3: [],
+      CurentState: [],
+    };
+
+    try {
+      const dataFile = fs.createReadStream(csvFilePath, "utf8");
+      dataFile
+        .pipe(stripBomStream())
+        .pipe(csv())
+        .on("data", (row) => {
+          resData.Key.push(row[""]);
+          resData.Rate1.push(row["Rate 1 (Green)"]);
+          resData.Rate2.push(row["Rate 2 (Yellow)"]);
+          resData.Rate3.push(row["Rate 3 (Red)"]);
+          resData.CurentState.push(row["Curent State"]);
         })
         .on("end", () => {
           resForm.successRes(res, resData);

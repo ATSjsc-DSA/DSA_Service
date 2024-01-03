@@ -33,6 +33,9 @@ const SSR_Contrl = {
   },
   detail: async (req, res, next) => {
     const csvFilePath = "File/SSR/Dm.csv";
+    if (!fs.existsSync(csvFilePath)) {
+      return next(createError.NotFound("File not found"));
+    }
     const genName = req.params._genName;
     const csvDataFilePath = `File/SSR/${genName}.csv`;
 
@@ -87,6 +90,9 @@ const SSR_Contrl = {
   },
   list: (req, res, next) => {
     const csvFilePath = "File/SSR/Dm.csv";
+    if (!fs.existsSync(csvFilePath)) {
+      return next(createError.NotFound("File not found"));
+    }
     const resData = [];
     try {
       const dataFile = fs.createReadStream(csvFilePath, "utf8");

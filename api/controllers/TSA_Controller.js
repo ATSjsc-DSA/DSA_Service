@@ -12,7 +12,9 @@ const TSA_Contrl = {
   detailSPS: async (req, res, next) => {
     const fileName = req.params._sps;
     const csvFilePath = `File/TSA/${fileName}_Check.csv`;
-
+    if (!fs.existsSync(csvFilePath)) {
+      return next(createError.NotFound("File not found"));
+    }
     const resData = {
       name: fileName,
       Key: [],
@@ -47,7 +49,9 @@ const TSA_Contrl = {
   detailGTTH: async (req, res, next) => {
     const fileName = req.params._gtth;
     const csvFilePath = `File/TSA/${fileName}.csv`;
-
+    if (!fs.existsSync(csvFilePath)) {
+      return next(createError.NotFound("File not found"));
+    }
     const resData = {
       name: fileName,
       Key: [],
@@ -84,7 +88,9 @@ const TSA_Contrl = {
   detailLine: async (req, res, next) => {
     const fileName = req.params._lineName;
     const csvFilePath = `File/TSA/chart/${fileName}.csv`;
-
+    if (!fs.existsSync(csvFilePath)) {
+      return next(createError.NotFound("File not found"));
+    }
     const resData = {
       name: fileName,
       time: [],
@@ -131,7 +137,9 @@ const TSA_Contrl = {
   listlLine: async (req, res, next) => {
     const fileName = req.params._lineName;
     const csvFilePath = `File/TSA/chart/results.csv`;
-
+    if (!fs.existsSync(csvFilePath)) {
+      return next(createError.NotFound("File not found"));
+    }
     const resData = {
       NQHT: [],
       DNPK: [],

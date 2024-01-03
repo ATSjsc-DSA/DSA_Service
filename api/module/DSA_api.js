@@ -6,6 +6,6 @@ const DSA_Data = express.Router();
 DSA_Data.get("/listSub", DAS_Contrl.detailSubs).get(
   "/listLine",
   DAS_Contrl.detailLines
-);
+).get("/dataSub", DAS_Contrl.infoSub);
 
 export default DSA_Data;
