@@ -39,6 +39,7 @@ pipeline {
             steps {
                 script {
                     //deploy 
+                    echo "Deploying..."
                 }
             }
         }
