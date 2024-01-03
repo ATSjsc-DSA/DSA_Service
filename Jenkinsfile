@@ -21,7 +21,7 @@ pipeline {
                 script {
                     
                     // install dependencies using npm
-                    bat "pm2 delete dsa_service"
+                    bat "pm2 delete all"
                 }
             }
         }
