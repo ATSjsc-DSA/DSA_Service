@@ -1,7 +1,9 @@
-const express = require("express");
-const createError = require("http-errors");
-const cors = require("cors");
-
+import express from "express";
+import createError from "http-errors";
+import cors from "cors";
+import bodyParser from "body-parser";
+import dotenv from "dotenv";
+import routes from "./routes/routes.js"; //importing route
 /*database*/
 
 // const path = require("path");
@@ -11,8 +13,8 @@ const cors = require("cors");
 //csv
 
 const app = express();
-const bodyParser = require("body-parser");
-require("dotenv").load();
+
+dotenv.config();
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -21,7 +23,6 @@ app.use(cors());
 
 console.log("start server api ...");
 
-const routes = require("./routes/routes"); //importing route
 app.use("/api", routes);
 
 // Middleware handle 404 Not Found
@@ -29,7 +30,7 @@ app.use((req, res, next) => {
   next(createError.NotFound("This route does not exist."));
 });
 
-// Middleware handle other error
+// Middleware handle other errors
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
   res.json({

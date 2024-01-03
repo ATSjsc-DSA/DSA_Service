@@ -1,10 +1,11 @@
-const express = require("express");
-const router = express.Router();
-const DAS_Contrl = require("../controllers/DSA_Controller");
+import express from "express";
+import DAS_Contrl from "../controllers/DSA_Controller.js";
 
-router
-  .get("", DAS_Contrl.detail)
-  .put(DAS_Contrl.update)
-  .delete(DAS_Contrl.delete);
+const DSA_Data = express.Router();
 
-module.exports = router;
+DSA_Data.get("/listSub", DAS_Contrl.detailSubs).get(
+  "/listLine",
+  DAS_Contrl.detailLines
+);
+
+export default DSA_Data;
