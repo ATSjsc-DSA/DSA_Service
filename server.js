@@ -23,6 +23,13 @@ app.use(cors());
 
 console.log("start server api ...");
 
+// Serve static files from the 'client/dist' directory
+app.use(express.static('client'));
+
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/client/index.html');
+});
+
 app.use("/api", routes);
 
 // Middleware handle 404 Not Found

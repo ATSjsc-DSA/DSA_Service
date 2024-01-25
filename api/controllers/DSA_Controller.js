@@ -4,6 +4,7 @@ import fs from "fs";
 import csv from "csv-parser";
 import resForm from "../../common/response.js";
 import createError from "http-errors";
+import { createObjectCsvWriter } from "csv-writer"; // Thêm thư viện csv-writer
 
 const DSA_Contrl = {
   get: (req, res, next) => {
@@ -18,7 +19,7 @@ const DSA_Contrl = {
       sub500kV: [],
       sub345kV: [],
       sub287kV: [],
-      sub220kV: [],
+      sub230kV: [],
       sub138kV: [],
       sub115kV: [],
       sub20kV: [],
@@ -31,9 +32,9 @@ const DSA_Contrl = {
         .pipe(csv())
         .on("data", (row) => {
           const subData = {
-            name: row.Location,
+            name: row.Name,
             Id: row.Code,
-            geo: [row.Longitude, row.Latitude],
+            geo: [parseFloat(row.Longitude), parseFloat(row.Latitude)],
           };
           switch (row.Type) {
             case "500":
@@ -45,14 +46,14 @@ const DSA_Contrl = {
             case "287":
               resData.sub287kV.push(subData);
               break;
-            case "220":
-              resData.sub220kV.push(subData);
+            case "230":
+              resData.sub230kV.push(subData);
               break;
             case "138":
               resData.sub138kV.push(subData);
               break;
             case "115":
-              resData.sub138kV.push(subData);
+              resData.sub115kV.push(subData);
               break;
             case "20":
               resData.sub20kV.push(subData);
@@ -92,10 +93,11 @@ const DSA_Contrl = {
         .pipe(csv())
         .on("data", (row) => {
           const dataLine = {
-            name: row.Code,
+            name: row.line,
+            desc: row.SubStart + "-" + row.SubEnd,
             geo: [
-              [row.longstart, row.latstart],
-              [row.longend, row.latend],
+              [parseFloat(row.longstart), parseFloat(row.latstart)],
+              [parseFloat(row.longend), parseFloat(row.latend)],
             ],
           };
           switch (row.Type) {
@@ -159,6 +161,150 @@ const DSA_Contrl = {
         })
         .on("end", () => {
           resForm.successRes(res, resData);
+        })
+        .on("error", (error) => {
+          next(createError.Conflict(error.message));
+        });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  voltageStandards: async (req, res, next) => {
+    const csvFileEvaluation = "File/standards/lowhight_voltage/evaluation.csv";
+    const csvFileValue = "File/standards/lowhight_voltage/value.csv";
+    if (!fs.existsSync(csvFileEvaluation) && !fs.existsSync(csvFileValue)) {
+      return next(createError.NotFound("File not found"));
+    }
+    const resData = {
+      evaluation: {},
+      value: [],
+    };
+
+    try {
+      const dataFileEvaluation = fs.createReadStream(csvFileEvaluation, "utf8");
+      dataFileEvaluation
+        .pipe(stripBomStream())
+        .pipe(csv())
+        .on("data", (row) => {
+          const key = row.value;
+          const value = parseFloat(row.ref);
+
+          resData.evaluation[key] = value;
+        })
+        .on("end", () => {
+          const dataFileValue = fs.createReadStream(csvFileValue, "utf8");
+          dataFileValue
+            .pipe(stripBomStream())
+            .pipe(csv())
+            .on("data", (row) => {
+              const subDetail = {
+                name: row.name,
+                value: parseFloat(row.value),
+              };
+              resData.value.push(subDetail);
+            })
+            .on("end", () => {
+              resForm.successRes(res, resData);
+            })
+            .on("error", (error) => {
+              next(createError.Conflict(error.message));
+            });
+        })
+        .on("error", (error) => {
+          next(createError.Conflict(error.message));
+        });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  lineLoadingStandards: async (req, res, next) => {
+    const csvFileEvaluation = "File/standards/line_loading/evaluation.csv";
+    const csvFileValue = "File/standards/line_loading/value.csv";
+    if (!fs.existsSync(csvFileEvaluation) && !fs.existsSync(csvFileValue)) {
+      return next(createError.NotFound("File not found"));
+    }
+    const resData = {
+      evaluation: {},
+      value: [],
+    };
+
+    try {
+      const dataFileEvaluation = fs.createReadStream(csvFileEvaluation, "utf8");
+      dataFileEvaluation
+        .pipe(stripBomStream())
+        .pipe(csv())
+        .on("data", (row) => {
+          const key = row.value;
+          const value = parseFloat(row.ref);
+
+          resData.evaluation[key] = value;
+        })
+        .on("end", () => {
+          const dataFileValue = fs.createReadStream(csvFileValue, "utf8");
+          dataFileValue
+            .pipe(stripBomStream())
+            .pipe(csv())
+            .on("data", (row) => {
+              const subDetail = {
+                name: row.name,
+                value: parseFloat(row.value),
+              };
+              resData.value.push(subDetail);
+            })
+            .on("end", () => {
+              resForm.successRes(res, resData);
+            })
+            .on("error", (error) => {
+              next(createError.Conflict(error.message));
+            });
+        })
+        .on("error", (error) => {
+          next(createError.Conflict(error.message));
+        });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  ssrStandards: async (req, res, next) => {
+    const csvFileEvaluation = "File/standards/SSR_module/evaluation.csv";
+    const csvFileValue = "File/standards/SSR_module/value.csv";
+    if (!fs.existsSync(csvFileEvaluation) && !fs.existsSync(csvFileValue)) {
+      return next(createError.NotFound("File not found"));
+    }
+    const resData = {
+      evaluation: {},
+      value: [],
+    };
+
+    try {
+      const dataFileEvaluation = fs.createReadStream(csvFileEvaluation, "utf8");
+      dataFileEvaluation
+        .pipe(stripBomStream())
+        .pipe(csv())
+        .on("data", (row) => {
+          const key = row.value;
+          const value = row.ref;
+
+          resData.evaluation[key] = value;
+        })
+        .on("end", () => {
+          const dataFileValue = fs.createReadStream(csvFileValue, "utf8");
+          dataFileValue
+            .pipe(stripBomStream())
+            .pipe(csv())
+            .on("data", (row) => {
+              const subDetail = {
+                name: row.name,
+                value: row.value,
+              };
+              resData.value.push(subDetail);
+            })
+            .on("end", () => {
+              resForm.successRes(res, resData);
+            })
+            .on("error", (error) => {
+              next(createError.Conflict(error.message));
+            });
         })
         .on("error", (error) => {
           next(createError.Conflict(error.message));
