@@ -4,6 +4,7 @@ import fs from "fs";
 import csv from "csv-parser";
 import resForm from "../../common/response.js";
 import createError from "http-errors";
+import getFileModificationTimeUtc from "../../common/fileHandler.js";
 
 const TSA_Contrl = {
   get: (req, res, next) => {
@@ -20,9 +21,14 @@ const TSA_Contrl = {
       Key: [],
       Require: [],
       Estimated: [],
+      modificationTime: null,
     };
     if (fs.existsSync(csvFilePath)) {
       try {
+        resData.modificationTime = await getFileModificationTimeUtc(
+          csvFilePath
+        );
+
         const dataFile = fs.createReadStream(csvFilePath, "utf8");
         dataFile
           .pipe(stripBomStream())
@@ -60,6 +66,9 @@ const TSA_Contrl = {
     };
     if (fs.existsSync(csvFilePath)) {
       try {
+        resData.modificationTime = await getFileModificationTimeUtc(
+          csvFilePath
+        );
         const dataFile = fs.createReadStream(csvFilePath, "utf8");
         dataFile
           .pipe(stripBomStream())
@@ -102,6 +111,9 @@ const TSA_Contrl = {
     };
     if (fs.existsSync(csvFilePath)) {
       try {
+        resData.modificationTime = await getFileModificationTimeUtc(
+          csvFilePath
+        );
         const dataFile = fs.createReadStream(csvFilePath, "utf8");
         dataFile
           .pipe(stripBomStream())

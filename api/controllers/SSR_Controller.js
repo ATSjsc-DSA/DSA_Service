@@ -4,7 +4,7 @@ import fs from "fs";
 import csv from "csv-parser";
 import resForm from "../../common/response.js";
 import createError from "http-errors";
-
+import getFileModificationTimeUtc from "../../common/fileHandler.js";
 const getDataFromFile = (filePath, filterKey, filterValue) => {
   return new Promise((resolve, reject) => {
     const data = [];
@@ -51,6 +51,7 @@ const SSR_Contrl = {
       lne_4001_4090_1: [],
       lne_3906_4001_2: [],
       lne_3906_4001_1: [],
+      modificationTime: null,
     };
 
     try {
@@ -63,6 +64,8 @@ const SSR_Contrl = {
         resData.dm.push({ x: x, y: row.dmin }, { x: x, y: row.dmax });
       });
       resData.name = genName;
+      resData.modificationTime = await getFileModificationTimeUtc(csvFilePath);
+
       const dataFile = fs.createReadStream(csvDataFilePath, "utf8");
       dataFile
         .pipe(stripBomStream())
