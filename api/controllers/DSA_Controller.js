@@ -265,6 +265,153 @@ const DSA_Contrl = {
       next(createError.InternalServerError(error.message));
     }
   },
+  transStandards: async (req, res, next) => {
+    const csvFileEvaluation =
+      "File/standards/tranformer_loading/evaluation.csv";
+    const csvFileValue = "File/standards/tranformer_loading/value.csv";
+    if (!fs.existsSync(csvFileEvaluation) && !fs.existsSync(csvFileValue)) {
+      return next(createError.NotFound("File not found"));
+    }
+    const resData = {
+      evaluation: {},
+      value: [],
+    };
+
+    try {
+      const dataFileEvaluation = fs.createReadStream(csvFileEvaluation, "utf8");
+      dataFileEvaluation
+        .pipe(stripBomStream())
+        .pipe(csv())
+        .on("data", (row) => {
+          const key = row.value;
+          const value = parseFloat(row.ref);
+
+          resData.evaluation[key] = value;
+        })
+        .on("end", () => {
+          const dataFileValue = fs.createReadStream(csvFileValue, "utf8");
+          dataFileValue
+            .pipe(stripBomStream())
+            .pipe(csv())
+            .on("data", (row) => {
+              const subDetail = {
+                name: row.name,
+                value: parseFloat(row.value),
+              };
+              resData.value.push(subDetail);
+            })
+            .on("end", () => {
+              resForm.successRes(res, resData);
+            })
+            .on("error", (error) => {
+              next(createError.Conflict(error.message));
+            });
+        })
+        .on("error", (error) => {
+          next(createError.Conflict(error.message));
+        });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  geneStandards: async (req, res, next) => {
+    const csvFileEvaluation =
+      "File/standards/tranformer_loading/evaluation.csv";
+    const csvFileValue = "File/standards/tranformer_loading/value.csv";
+    if (!fs.existsSync(csvFileEvaluation) && !fs.existsSync(csvFileValue)) {
+      return next(createError.NotFound("File not found"));
+    }
+    const resData = {
+      evaluation: {},
+      value: [],
+    };
+
+    try {
+      const dataFileEvaluation = fs.createReadStream(csvFileEvaluation, "utf8");
+      dataFileEvaluation
+        .pipe(stripBomStream())
+        .pipe(csv())
+        .on("data", (row) => {
+          const key = row.value;
+          const value = parseFloat(row.ref);
+
+          resData.evaluation[key] = value;
+        })
+        .on("end", () => {
+          const dataFileValue = fs.createReadStream(csvFileValue, "utf8");
+          dataFileValue
+            .pipe(stripBomStream())
+            .pipe(csv())
+            .on("data", (row) => {
+              const subDetail = {
+                name: row.name,
+                value: parseFloat(row.value),
+              };
+              resData.value.push(subDetail);
+            })
+            .on("end", () => {
+              resForm.successRes(res, resData);
+            })
+            .on("error", (error) => {
+              next(createError.Conflict(error.message));
+            });
+        })
+        .on("error", (error) => {
+          next(createError.Conflict(error.message));
+        });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  exciStandards: async (req, res, next) => {
+    const csvFileEvaluation =
+      "File/standards/excitation_limiter/evaluation.csv";
+    const csvFileValue = "File/standards/excitation_limiter/value.csv";
+    if (!fs.existsSync(csvFileEvaluation) && !fs.existsSync(csvFileValue)) {
+      return next(createError.NotFound("File not found"));
+    }
+    const resData = {
+      evaluation: {},
+      value: [],
+    };
+
+    try {
+      const dataFileEvaluation = fs.createReadStream(csvFileEvaluation, "utf8");
+      dataFileEvaluation
+        .pipe(stripBomStream())
+        .pipe(csv())
+        .on("data", (row) => {
+          const key = row.value;
+          const value = parseFloat(row.ref);
+
+          resData.evaluation[key] = value;
+        })
+        .on("end", () => {
+          const dataFileValue = fs.createReadStream(csvFileValue, "utf8");
+          dataFileValue
+            .pipe(stripBomStream())
+            .pipe(csv())
+            .on("data", (row) => {
+              const subDetail = {
+                name: row.name,
+                value: parseFloat(row.value),
+              };
+              resData.value.push(subDetail);
+            })
+            .on("end", () => {
+              resForm.successRes(res, resData);
+            })
+            .on("error", (error) => {
+              next(createError.Conflict(error.message));
+            });
+        })
+        .on("error", (error) => {
+          next(createError.Conflict(error.message));
+        });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
   ssrStandards: async (req, res, next) => {
     const csvFileEvaluation = "File/standards/SSR_module/evaluation.csv";
     const csvFileValue = "File/standards/SSR_module/value.csv";
@@ -296,6 +443,102 @@ const DSA_Contrl = {
               const subDetail = {
                 name: row.name,
                 value: row.value,
+              };
+              resData.value.push(subDetail);
+            })
+            .on("end", () => {
+              resForm.successRes(res, resData);
+            })
+            .on("error", (error) => {
+              next(createError.Conflict(error.message));
+            });
+        })
+        .on("error", (error) => {
+          next(createError.Conflict(error.message));
+        });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  tsaStandards: async (req, res, next) => {
+    const csvFileEvaluation = "File/standards/TSA_module/evaluation.csv";
+    const csvFileValue = "File/standards/TSA_module/value.csv";
+    if (!fs.existsSync(csvFileEvaluation) && !fs.existsSync(csvFileValue)) {
+      return next(createError.NotFound("File not found"));
+    }
+    const resData = {
+      evaluation: {},
+      value: [],
+    };
+
+    try {
+      const dataFileEvaluation = fs.createReadStream(csvFileEvaluation, "utf8");
+      dataFileEvaluation
+        .pipe(stripBomStream())
+        .pipe(csv())
+        .on("data", (row) => {
+          const key = row.value;
+          const value = parseFloat(row.ref);
+
+          resData.evaluation[key] = value;
+        })
+        .on("end", () => {
+          const dataFileValue = fs.createReadStream(csvFileValue, "utf8");
+          dataFileValue
+            .pipe(stripBomStream())
+            .pipe(csv())
+            .on("data", (row) => {
+              const subDetail = {
+                name: row.name,
+                value: parseFloat(row.value),
+              };
+              resData.value.push(subDetail);
+            })
+            .on("end", () => {
+              resForm.successRes(res, resData);
+            })
+            .on("error", (error) => {
+              next(createError.Conflict(error.message));
+            });
+        })
+        .on("error", (error) => {
+          next(createError.Conflict(error.message));
+        });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  vsaStandards: async (req, res, next) => {
+    const csvFileEvaluation = "File/standards/VSA_module/evaluation.csv";
+    const csvFileValue = "File/standards/VSA_module/value.csv";
+    if (!fs.existsSync(csvFileEvaluation) && !fs.existsSync(csvFileValue)) {
+      return next(createError.NotFound("File not found"));
+    }
+    const resData = {
+      evaluation: {},
+      value: [],
+    };
+
+    try {
+      const dataFileEvaluation = fs.createReadStream(csvFileEvaluation, "utf8");
+      dataFileEvaluation
+        .pipe(stripBomStream())
+        .pipe(csv())
+        .on("data", (row) => {
+          const key = row.value;
+          const value = parseFloat(row.ref);
+
+          resData.evaluation[key] = value;
+        })
+        .on("end", () => {
+          const dataFileValue = fs.createReadStream(csvFileValue, "utf8");
+          dataFileValue
+            .pipe(stripBomStream())
+            .pipe(csv())
+            .on("data", (row) => {
+              const subDetail = {
+                name: row.name,
+                value: parseFloat(row.value),
               };
               resData.value.push(subDetail);
             })
