@@ -108,9 +108,14 @@ const TSA_Contrl = {
       mean: [],
       t_stablility: [],
       stability: [],
+      modificationTime: null,
+
     };
     if (fs.existsSync(csvFilePath)) {
       try {
+        resData.modificationTime = await getFileModificationTimeUtc(
+          csvFilePath
+        );
         resData.modificationTime = await getFileModificationTimeUtc(
           csvFilePath
         );
