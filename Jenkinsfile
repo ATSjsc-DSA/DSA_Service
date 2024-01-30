@@ -36,7 +36,7 @@ pipeline {
             steps {
                 script {
                     // check 'DSA_service' running ?
-                    def pm2List = bat(script: 'pm2 list', returnStatus: true).trim()
+                    def pm2List = bat(script: 'pm2 list', returnStdout: true).trim()
                     if (pm2List.contains('DSA_service')) {
                         echo 'restart DSA_service ...'
                         bat 'pm2 restart DSA_service'
