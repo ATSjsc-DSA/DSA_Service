@@ -15,18 +15,14 @@ pipeline {
                 }
             }
         }
-
-        stage('clear dsa_service') {
+        stage('Deploy') {
             steps {
                 script {
-                    
-                    // install dependencies using npm
-                    bat "pm2 delete all"
+                    //deploy 
+                    echo "Deploying..."
                 }
             }
         }
-
-
         stage('Install Dependencies') {
             steps {
                 script {
@@ -37,6 +33,15 @@ pipeline {
             }
         }
 
+        stage('clear dsa_service') {
+            steps {
+                script {
+                    
+                    // install dependencies using npm
+                    bat "pm2 delete all"
+                }
+            }
+        }
         stage('Build') {
             steps {
                 script {
@@ -46,14 +51,7 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            steps {
-                script {
-                    //deploy 
-                    echo "Deploying..."
-                }
-            }
-        }
+        
     }
 
     post {

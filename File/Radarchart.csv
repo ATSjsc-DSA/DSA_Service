@@ -1,0 +1,9 @@
+Unnamed: 0,Rate 1 (Green),Rate 2 (Yellow),Rate 3 (Red),Curent State
+Line Loading,90,95,100,1
+Tranformer Loading,90,95,100,1
+Generator Loading,90,95,100,1
+Excitation Limiter,90,95,100,1
+Low/High Voltage,90,95,100,1
+VSA Module,90,95,100,1
+TSA Module,90,95,100,1
+SSR Module,90,95,100,1
