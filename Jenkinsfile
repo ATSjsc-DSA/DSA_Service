@@ -32,24 +32,22 @@ pipeline {
                 }
             }
         }
-
-        stage('clear dsa_service') {
+        stage('Restart or Start DSA_service') {
             steps {
                 script {
-                    
-                    // install dependencies using npm
-                    bat "pm2 delete all"
+                    // check 'DSA_service' running ?
+                    def pm2List = bat(script: 'pm2 list', returnStatus: true).trim()
+                    if (pm2List.contains('DSA_service')) {
+                        echo 'restart DSA_service ...'
+                        bat 'pm2 restart DSA_service'
+                    } else {
+                        // start 'DSA_service'
+                        echo 'start DSA_service ...'
+                        bat 'pm2 start server.js --name DSA_service'
+                    }
                 }
             }
-        }
-        stage('Build') {
-            steps {
-                script {
-                    // run server for develop
-                    bat "pm2 start server.js"
-                }
-            }
-        }
+}
 
         
     }
