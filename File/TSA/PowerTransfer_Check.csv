@@ -1,5 +1,5 @@
 ﻿Ref,Require,Estimated
-PowerTransfer_T_B,10000,9000
+PowerTransfer_T_B,10000,-9000
 PowerTransfer_B_T,10000,9000
-PowerTransfer_T_N,10000,9000
+PowerTransfer_T_N,10000,-9000
 PowerTransfer_N_T,10000,9000

@@ -5,10 +5,39 @@ import csv from "csv-parser";
 import resForm from "../../common/response.js";
 import createError from "http-errors";
 import { createObjectCsvWriter } from "csv-writer"; // Thêm thư viện csv-writer
+import getFileModificationTimeUtc from "../../common/fileHandler.js";
 
 const DSA_Contrl = {
-  get: (req, res, next) => {
-    res.send("Hello World!");
+  logs: async (req, res, next) => {
+    const fileName = req.params._sps;
+    const csvFilePath = `File/Notification.csv`;
+    if (!fs.existsSync(csvFilePath)) {
+      return next(createError.NotFound("File not found"));
+    }
+    const resData = [];
+
+    if (fs.existsSync(csvFilePath)) {
+      try {
+        const dataFile = fs.createReadStream(csvFilePath, "utf8");
+        dataFile
+          .pipe(stripBomStream())
+          .pipe(csv())
+          .on("data", (data) => {
+            data.Timestamp = parseFloat(data.Timestamp);
+            resData.push(data);
+          })
+          .on("end", () => {
+            resForm.successRes(res, resData);
+          })
+          .on("error", (error) => {
+            next(createError.Conflict(error.message));
+          });
+      } catch (error) {
+        next(createError.InternalServerError(error.message));
+      }
+    } else {
+      next(createError.NotFound(`File not found: ${fileName}`));
+    }
   },
   detailSubs: async (req, res, next) => {
     const csvFilePath = "File/mp_sub.csv";
@@ -141,23 +170,28 @@ const DSA_Contrl = {
     }
     const resData = {
       Key: [],
-      Rate1: [],
-      Rate2: [],
-      Rate3: [],
-      CurentState: [],
+      data: {
+        Rate1: [],
+        Rate2: [],
+        Rate3: [],
+        CurentState: [],
+      },
+      modificationTime: null,
     };
 
     try {
+      resData.modificationTime = await getFileModificationTimeUtc(csvFilePath);
+
       const dataFile = fs.createReadStream(csvFilePath, "utf8");
       dataFile
         .pipe(stripBomStream())
         .pipe(csv())
         .on("data", (row) => {
-          resData.Key.push(row[""]);
-          resData.Rate1.push(row["Rate 1 (Green)"]);
-          resData.Rate2.push(row["Rate 2 (Yellow)"]);
-          resData.Rate3.push(row["Rate 3 (Red)"]);
-          resData.CurentState.push(row["Curent State"]);
+          resData.Key.push(row["Unnamed: 0"]);
+          resData.data.Rate1.push(parseFloat(row["Rate 1 (Green)"]));
+          resData.data.Rate2.push(parseFloat(row["Rate 2 (Yellow)"]));
+          resData.data.Rate3.push(parseFloat(row["Rate 3 (Red)"]));
+          resData.data.CurentState.push(parseFloat(row["Curent State"]));
         })
         .on("end", () => {
           resForm.successRes(res, resData);

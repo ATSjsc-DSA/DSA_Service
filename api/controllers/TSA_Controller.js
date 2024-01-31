@@ -19,10 +19,13 @@ const TSA_Contrl = {
     const resData = {
       name: fileName,
       Key: [],
-      Require: [],
-      Estimated: [],
+      data: {
+        Require: [],
+        Estimated: [],
+      },
       modificationTime: null,
     };
+
     if (fs.existsSync(csvFilePath)) {
       try {
         resData.modificationTime = await getFileModificationTimeUtc(
@@ -34,9 +37,17 @@ const TSA_Contrl = {
           .pipe(stripBomStream())
           .pipe(csv())
           .on("data", (row) => {
-            resData.Key.push(row.Ref);
-            resData.Require.push(row.Require);
-            resData.Estimated.push(row.Estimated);
+            if (fileName === "PowerTransfer") {
+              if (row.Estimated > 0) {
+                resData.Key.push(row.Ref);
+                resData.data.Require.push(row.Require);
+                resData.data.Estimated.push(row.Estimated);
+              }
+            } else {
+              resData.Key.push(row.Ref);
+              resData.data.Require.push(row.Require);
+              resData.data.Estimated.push(row.Estimated);
+            }
           })
           .on("end", () => {
             resForm.successRes(res, resData);
@@ -52,17 +63,19 @@ const TSA_Contrl = {
     }
   },
 
-  detailGTTH: async (req, res, next) => {
-    const fileName = req.params._gtth;
-    const csvFilePath = `File/TSA/${fileName}.csv`;
+  detailTTTG: async (req, res, next) => {
+    const lineName = req.params._line;
+    const csvFilePath = `File/TSA/TransferCapacity.csv`;
     if (!fs.existsSync(csvFilePath)) {
       return next(createError.NotFound("File not found"));
     }
     const resData = {
-      name: fileName,
+      name: lineName,
       Key: [],
-      "NhoQuan-HaTinh": [],
-      "DaNang-Pleiku": [],
+      data: {
+        value: [],
+      },
+      modificationTime: 0,
     };
     if (fs.existsSync(csvFilePath)) {
       try {
@@ -75,8 +88,7 @@ const TSA_Contrl = {
           .pipe(csv())
           .on("data", (row) => {
             resData.Key.push(row.Ref);
-            resData["NhoQuan-HaTinh"].push(row["NhoQuan-HaTinh"]);
-            resData["DaNang-Pleiku"].push(row["DaNang-Pleiku"]);
+            resData.data.value.push(row[lineName]);
           })
           .on("end", () => {
             resForm.successRes(res, resData);
@@ -92,6 +104,41 @@ const TSA_Contrl = {
       next(createError.NotFound(`File not found: ${fileName}`));
     }
   },
+  listTypeLine: async (req, res, next) => {
+    const csvFilePath = `File/TSA/TransferCapacity.csv`;
+    if (!fs.existsSync(csvFilePath)) {
+      return next(createError.NotFound("File not found"));
+    }
+    let resData = [];
+    if (fs.existsSync(csvFilePath)) {
+      try {
+        const dataFile = fs.createReadStream(csvFilePath, "utf8");
+        dataFile
+          .pipe(stripBomStream())
+          .pipe(csv())
+          .on("headers", (headers) => {
+            if (headers.length > 0) {
+              headers.shift();
+            }
+            headers.forEach((element) => {
+              resData.push({ name: element });
+            });
+          })
+          .on("data", (data) => {})
+          .on("end", () => {
+            resForm.successRes(res, resData);
+          })
+          .on("error", (error) => {
+            console.log(error, "error");
+            next(createError.Conflict(error.message));
+          });
+      } catch (error) {
+        next(createError.InternalServerError(error.message));
+      }
+    } else {
+      next(createError.NotFound(`File not found`));
+    }
+  },
 
   detailLine: async (req, res, next) => {
     const fileName = req.params._lineName;
@@ -101,21 +148,19 @@ const TSA_Contrl = {
     }
     const resData = {
       name: fileName,
-      time: [],
-      value: [],
-      PowerTranfer: [],
-      peak: [],
-      mean: [],
-      t_stablility: [],
-      stability: [],
+      data: {
+        time: [],
+        value: [],
+        PowerTranfer: [],
+        peak: [],
+        mean: [],
+        t_stablility: [],
+        stability: [],
+      },
       modificationTime: null,
-
     };
     if (fs.existsSync(csvFilePath)) {
       try {
-        resData.modificationTime = await getFileModificationTimeUtc(
-          csvFilePath
-        );
         resData.modificationTime = await getFileModificationTimeUtc(
           csvFilePath
         );
@@ -124,14 +169,14 @@ const TSA_Contrl = {
           .pipe(stripBomStream())
           .pipe(csv())
           .on("data", (row) => {
-            resData.time.push(row.time);
-            resData.value.push(row.value);
-            resData.PowerTranfer.push(row.PowerTranfer);
+            resData.data.time.push(row.time);
+            resData.data.value.push(row.value);
+            resData.data.PowerTranfer.push(row.PowerTranfer);
             if (row.peak != "") {
-              resData.peak.push(row.peak);
-              resData.mean.push(row.mean);
-              resData.t_stablility.push(row.t_stablility);
-              resData.stability.push(row.stability);
+              resData.data.peak.push(row.peak);
+              resData.data.mean.push(row.mean);
+              resData.data.t_stablility.push(row.t_stablility);
+              resData.data.stability.push(row.stability);
             }
           })
           .on("end", () => {

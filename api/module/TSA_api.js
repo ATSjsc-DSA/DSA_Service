@@ -4,7 +4,8 @@ import TSA_Contrl from "../controllers/TSA_Controller.js";
 const TSA_Data = express.Router();
 
 TSA_Data.get("/sps/:_sps", TSA_Contrl.detailSPS);
-TSA_Data.get("/gtth/:_gtth", TSA_Contrl.detailGTTH);
+TSA_Data.get("/tttg/TransferCapacity/:_line", TSA_Contrl.detailTTTG);
+TSA_Data.get("/tttg/listTypeLine", TSA_Contrl.listTypeLine);
 TSA_Data.get("/line/:_lineName", TSA_Contrl.detailLine);
 TSA_Data.get("/line", TSA_Contrl.listlLine);
 

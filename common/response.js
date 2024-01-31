@@ -1,5 +1,5 @@
 const resForm = {
-  successRes: (res, payload = {}, statusCode = 200) => {
+  successRes: (res, payload, statusCode = 200) => {
     return res.status(statusCode).json({ success: true, payload });
   },
 };
