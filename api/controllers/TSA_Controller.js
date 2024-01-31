@@ -94,7 +94,6 @@ const TSA_Contrl = {
             resForm.successRes(res, resData);
           })
           .on("error", (error) => {
-            console.log(error, "error");
             next(createError.Conflict(error.message));
           });
       } catch (error) {
@@ -129,7 +128,6 @@ const TSA_Contrl = {
             resForm.successRes(res, resData);
           })
           .on("error", (error) => {
-            console.log(error, "error");
             next(createError.Conflict(error.message));
           });
       } catch (error) {
