@@ -15,5 +15,4 @@ DSA_Data.get("/logs", DAS_Contrl.logs)
   .get("/TSAStandards", DAS_Contrl.tsaStandards)
   .get("/VSAStandards", DAS_Contrl.vsaStandards)
   .get("/SSRStandards", DAS_Contrl.ssrStandards);
-
 export default DSA_Data;
