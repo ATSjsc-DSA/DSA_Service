@@ -23,7 +23,7 @@ const DSA_Contrl = {
           .pipe(stripBomStream())
           .pipe(csv())
           .on("data", (data) => {
-            data.Timestamp = parseFloat(data.Timestamp);
+            data.Timestamp = parseFloat(data.Timestamp * 1000);
             resData.push(data);
           })
           .on("end", () => {
@@ -215,6 +215,7 @@ const DSA_Contrl = {
     };
 
     try {
+      const data = {};
       const dataFileEvaluation = fs.createReadStream(csvFileEvaluation, "utf8");
       dataFileEvaluation
         .pipe(stripBomStream())
@@ -231,13 +232,20 @@ const DSA_Contrl = {
             .pipe(stripBomStream())
             .pipe(csv())
             .on("data", (row) => {
-              const subDetail = {
-                name: row.name,
-                value: parseFloat(row.value),
-              };
-              resData.value.push(subDetail);
+              const key = row.Substation;
+              const voltage = parseFloat(row.Voltage);
+
+              if (!data[key] || voltage > data[key].Voltage) {
+                data[key] = {
+                  Voltage: voltage,
+                  Busbar: row.Busbar,
+                  Substation: row.Substation,
+                  kV: row.kV,
+                };
+              }
             })
             .on("end", () => {
+              resData.value = Object.values(data);
               resForm.successRes(res, resData);
             })
             .on("error", (error) => {
@@ -280,8 +288,8 @@ const DSA_Contrl = {
             .pipe(csv())
             .on("data", (row) => {
               const subDetail = {
-                name: row.name,
-                value: parseFloat(row.value),
+                Line: row.Line,
+                Loading: parseFloat(row.Loading),
               };
               resData.value.push(subDetail);
             })
@@ -312,6 +320,7 @@ const DSA_Contrl = {
     };
 
     try {
+      const data = {};
       const dataFileEvaluation = fs.createReadStream(csvFileEvaluation, "utf8");
       dataFileEvaluation
         .pipe(stripBomStream())
@@ -328,13 +337,19 @@ const DSA_Contrl = {
             .pipe(stripBomStream())
             .pipe(csv())
             .on("data", (row) => {
-              const subDetail = {
-                name: row.name,
-                value: parseFloat(row.value),
-              };
-              resData.value.push(subDetail);
+              const key = row.Substation;
+              const loading = parseFloat(row.Loading);
+
+              if (!data[key] || loading > data[key].loading) {
+                data[key] = {
+                  Loading: loading,
+                  Trans: row.Trans,
+                  Substation: row.Substation,
+                };
+              }
             })
             .on("end", () => {
+              resData.value = Object.values(data);
               resForm.successRes(res, resData);
             })
             .on("error", (error) => {
@@ -349,9 +364,8 @@ const DSA_Contrl = {
     }
   },
   geneStandards: async (req, res, next) => {
-    const csvFileEvaluation =
-      "File/standards/tranformer_loading/evaluation.csv";
-    const csvFileValue = "File/standards/tranformer_loading/value.csv";
+    const csvFileEvaluation = "File/standards/generator_loading/evaluation.csv";
+    const csvFileValue = "File/standards/generator_loading/value.csv";
     if (!fs.existsSync(csvFileEvaluation) && !fs.existsSync(csvFileValue)) {
       return next(createError.NotFound("File not found"));
     }
@@ -359,8 +373,8 @@ const DSA_Contrl = {
       evaluation: {},
       value: [],
     };
-
     try {
+      const data = {};
       const dataFileEvaluation = fs.createReadStream(csvFileEvaluation, "utf8");
       dataFileEvaluation
         .pipe(stripBomStream())
@@ -377,13 +391,19 @@ const DSA_Contrl = {
             .pipe(stripBomStream())
             .pipe(csv())
             .on("data", (row) => {
-              const subDetail = {
-                name: row.name,
-                value: parseFloat(row.value),
-              };
-              resData.value.push(subDetail);
+              const key = row.Substation;
+              const loading = parseFloat(row.Loading);
+
+              if (!data[key] || loading > data[key].loading) {
+                data[key] = {
+                  Loading: loading,
+                  Gen: row.Gen,
+                  Substation: row.Substation,
+                };
+              }
             })
             .on("end", () => {
+              resData.value = Object.values(data);
               resForm.successRes(res, resData);
             })
             .on("error", (error) => {
@@ -410,6 +430,7 @@ const DSA_Contrl = {
     };
 
     try {
+      const data = {};
       const dataFileEvaluation = fs.createReadStream(csvFileEvaluation, "utf8");
       dataFileEvaluation
         .pipe(stripBomStream())
@@ -426,13 +447,19 @@ const DSA_Contrl = {
             .pipe(stripBomStream())
             .pipe(csv())
             .on("data", (row) => {
-              const subDetail = {
-                name: row.name,
-                value: parseFloat(row.value),
-              };
-              resData.value.push(subDetail);
+              const key = row.Substation;
+              const loading = parseFloat(row.Loading);
+
+              if (!data[key] || loading > data[key].loading) {
+                data[key] = {
+                  Loading: loading,
+                  Gen: row.Gen,
+                  Substation: row.Substation,
+                };
+              }
             })
             .on("end", () => {
+              resData.value = Object.values(data);
               resForm.successRes(res, resData);
             })
             .on("error", (error) => {
@@ -458,6 +485,8 @@ const DSA_Contrl = {
     };
 
     try {
+      const data = {};
+
       const dataFileEvaluation = fs.createReadStream(csvFileEvaluation, "utf8");
       dataFileEvaluation
         .pipe(stripBomStream())
@@ -474,13 +503,19 @@ const DSA_Contrl = {
             .pipe(stripBomStream())
             .pipe(csv())
             .on("data", (row) => {
-              const subDetail = {
-                name: row.name,
-                value: row.value,
-              };
-              resData.value.push(subDetail);
+              const key = row.Substation;
+              const value = parseFloat(row.SSR);
+
+              if (!data[key] || loading > data[key].loading) {
+                data[key] = {
+                  Value: value,
+                  Gen: row.Gen,
+                  Substation: row.Substation,
+                };
+              }
             })
             .on("end", () => {
+              resData.value = Object.values(data);
               resForm.successRes(res, resData);
             })
             .on("error", (error) => {

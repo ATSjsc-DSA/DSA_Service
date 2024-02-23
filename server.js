@@ -3,6 +3,8 @@ import createError from "http-errors";
 import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import compression from "compression";
+
 import routes from "./routes/routes.js"; //importing route
 /*database*/
 
@@ -20,14 +22,14 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
-
+app.use(compression());
 console.log("start server api ...");
 
 // Serve static files from the 'client/dist' directory
-app.use(express.static('client'));
+app.use(express.static("client"));
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/client/index.html');
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/client/index.html");
 });
 
 app.use("/api", routes);
