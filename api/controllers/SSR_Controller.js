@@ -64,7 +64,9 @@ const SSR_Contrl = {
         resData.dm.push({ x: x, y: row.dmin }, { x: x, y: row.dmax });
       });
       resData.name = genName;
-      resData.modificationTime = await getFileModificationTimeUtc(csvFilePath);
+      resData.modificationTime = await getFileModificationTimeUtc(
+        csvDataFilePath
+      );
 
       const dataFile = fs.createReadStream(csvDataFilePath, "utf8");
       dataFile
