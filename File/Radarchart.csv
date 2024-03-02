@@ -1,9 +1,9 @@
 Unnamed: 0,Rate 1 (Green),Rate 2 (Yellow),Rate 3 (Red),Curent State
-Line Loading,90,95,100,105.8105539
-Tranformer Loading,90,95,100,96.38243234
-Generator Loading,90,95,100,192.9816572
+Line Loading,90,95,100,153.422646
+Tranformer Loading,90,95,100,139.3127352
+Generator Loading,90,95,100,391.5037908
 Excitation Limiter,90,95,100,96
-Low/High Voltage,90,95,100,85.55930031
-VSA Module,90,95,100,49.80354834
-TSA Module,90,95,100,71.79374629
-SSR Module,90,95,100,93.29670619
+Low/High Voltage,90,95,100,65.93234432
+VSA Module,90,95,100,38.359169
+TSA Module,90,95,100,100
+SSR Module,90,95,100,167.5

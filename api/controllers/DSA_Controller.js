@@ -6,6 +6,7 @@ import resForm from "../../common/response.js";
 import createError from "http-errors";
 import { createObjectCsvWriter } from "csv-writer"; // Thêm thư viện csv-writer
 import getFileModificationTimeUtc from "../../common/fileHandler.js";
+import { log } from "util";
 
 const DSA_Contrl = {
   logs: async (req, res, next) => {
@@ -493,7 +494,7 @@ const DSA_Contrl = {
         .pipe(csv())
         .on("data", (row) => {
           const key = row.value;
-          const value = row.ref;
+          const value = parseFloat(row.ref);
 
           resData.evaluation[key] = value;
         })
@@ -557,9 +558,10 @@ const DSA_Contrl = {
             .pipe(stripBomStream())
             .pipe(csv())
             .on("data", (row) => {
+              console.log(row, "row");
               const subDetail = {
-                name: row.name,
-                value: parseFloat(row.value),
+                name: row.Line,
+                value: parseFloat(row.Value),
               };
               resData.value.push(subDetail);
             })
