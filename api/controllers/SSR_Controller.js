@@ -61,7 +61,10 @@ const SSR_Contrl = {
       }
       dmData.forEach((row) => {
         const x = String(row.f / 50);
-        resData.dm.push({ x: x, y: row.dmin }, { x: x, y: row.dmax });
+        resData.dm.push(
+          { x: parseFloat(x * 50), y: parseFloat(row.dmin) },
+          { x: parseFloat(x * 50), y: parseFloat(row.dmax) }
+        );
       });
       resData.name = genName;
       resData.modificationTime = await getFileModificationTimeUtc(
@@ -73,15 +76,15 @@ const SSR_Contrl = {
         .pipe(stripBomStream())
         .pipe(csv())
         .on("data", (row) => {
-          resData.freq.push(row.freq);
-          resData.base.push(row.Base);
-          resData.lne_4001_8001_1.push(row.lne_4001_8001_1);
-          resData.lne_4001_4204_1.push(row.lne_4001_4204_1);
-          resData.lne_4001_4097_1.push(row.lne_4001_4097_1);
-          resData.lne_4001_4094_1.push(row.lne_4001_4094_1);
-          resData.lne_4001_4090_1.push(row.lne_4001_4090_1);
-          resData.lne_3906_4001_2.push(row.lne_3906_4001_2);
-          resData.lne_3906_4001_1.push(row.lne_3906_4001_1);
+          resData.freq.push(parseFloat((row.freq * 50).toFixed(2)));
+          resData.base.push(parseFloat(row.Base));
+          resData.lne_4001_8001_1.push(parseFloat(row.lne_4001_8001_1));
+          resData.lne_4001_4204_1.push(parseFloat(row.lne_4001_4204_1));
+          resData.lne_4001_4097_1.push(parseFloat(row.lne_4001_4097_1));
+          resData.lne_4001_4094_1.push(parseFloat(row.lne_4001_4094_1));
+          resData.lne_4001_4090_1.push(parseFloat(row.lne_4001_4090_1));
+          resData.lne_3906_4001_2.push(parseFloat(row.lne_3906_4001_2));
+          resData.lne_3906_4001_1.push(parseFloat(row.lne_3906_4001_1));
         })
         .on("end", () => {
           resForm.successRes(res, resData);

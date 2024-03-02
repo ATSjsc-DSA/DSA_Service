@@ -1,10 +1,10 @@
-﻿Ref,NhoQuan-HaTinh,DaNang-Pleiku
+Ref,Area1-Area2,Area2-Area3
 Current,1500,1500
-Thermal_Limitation,2000,2200
+Thermal_Limitation,2200,2200
 Thermal_Offline_Limitation,2300,2300
-PV_Limitation,2100,2100
-PV_Offline_Limitation,2150,2250
-TSAT_Limitation,2000,2000
+PV_Limitation,5534.218335,5242.826736
+PV_Offline_Limitation,1234,1234
+TSAT_Limitation,2969.492111,3636.119266
 TSAT_Offline_Limitation,2150,2150
 Load_Shedding,200,200
 Load_Shedding_Offline,250,250

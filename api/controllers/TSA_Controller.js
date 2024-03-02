@@ -118,32 +118,28 @@ const TSA_Contrl = {
       return next(createError.NotFound("File not found"));
     }
     let resData = [];
-    if (fs.existsSync(csvFilePath)) {
-      try {
-        const dataFile = fs.createReadStream(csvFilePath, "utf8");
-        dataFile
-          .pipe(stripBomStream())
-          .pipe(csv())
-          .on("headers", (headers) => {
-            if (headers.length > 0) {
-              headers.shift();
-            }
-            headers.forEach((element) => {
-              resData.push({ name: element });
-            });
-          })
-          .on("data", (data) => {})
-          .on("end", () => {
-            resForm.successRes(res, resData);
-          })
-          .on("error", (error) => {
-            next(createError.Conflict(error.message));
+    try {
+      const dataFile = fs.createReadStream(csvFilePath, "utf8");
+      dataFile
+        .pipe(stripBomStream())
+        .pipe(csv())
+        .on("headers", (headers) => {
+          if (headers.length > 0) {
+            headers.shift();
+          }
+          headers.forEach((element) => {
+            resData.push({ name: element });
           });
-      } catch (error) {
-        next(createError.InternalServerError(error.message));
-      }
-    } else {
-      next(createError.NotFound(`File not found`));
+        })
+        .on("data", (data) => {})
+        .on("end", () => {
+          resForm.successRes(res, resData);
+        })
+        .on("error", (error) => {
+          next(createError.Conflict(error.message));
+        });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
     }
   },
 
@@ -176,14 +172,14 @@ const TSA_Contrl = {
           .pipe(stripBomStream())
           .pipe(csv())
           .on("data", (row) => {
-            resData.data.time.push(row.time);
-            resData.data.value.push(row.value);
-            resData.data.PowerTranfer.push(row.PowerTranfer);
+            resData.data.time.push(parseFloat(row.time));
+            resData.data.value.push(parseFloat(row.value));
+            resData.data.PowerTranfer.push(parseFloat(row.PowerTranfer));
             if (row.peak != "") {
-              resData.data.peak.push(row.peak);
-              resData.data.mean.push(row.mean);
-              resData.data.t_stablility.push(row.t_stablility);
-              resData.data.stability.push(row.stability);
+              resData.data.peak.push(parseFloat(row.peak));
+              resData.data.mean.push(parseFloat(row.mean));
+              resData.data.t_stablility.push(parseFloat(row.t_stablility));
+              resData.data.stability.push(parseFloat(row.stability));
             }
           })
           .on("end", () => {
@@ -201,40 +197,57 @@ const TSA_Contrl = {
   },
 
   listlLine: async (req, res, next) => {
-    const fileName = req.params._lineName;
+    const csvFileTypeLinePath = `File/TSA/TransferCapacity.csv`;
     const csvFilePath = `File/TSA/chart/results.csv`;
+    if (!fs.existsSync(csvFileTypeLinePath)) {
+      return next(createError.NotFound("File not found"));
+    }
     if (!fs.existsSync(csvFilePath)) {
       return next(createError.NotFound("File not found"));
     }
-    const resData = {
-      NQHT: [],
-      DNPK: [],
-    };
-    if (fs.existsSync(csvFilePath)) {
-      try {
-        const dataFile = fs.createReadStream(csvFilePath, "utf8");
-        dataFile
-          .pipe(stripBomStream())
-          .pipe(csv())
-          .on("data", (row) => {
-            if (row.line === "NhoQuan-HaTinh") {
-              resData.NQHT.push({ name: row.Load_scale });
-            }
-            if (row.line === "DaNang-Pleiku") {
-              resData.DNPK.push({ name: row.Load_scale });
-            }
-          })
-          .on("end", () => {
-            resForm.successRes(res, resData);
-          })
-          .on("error", (error) => {
-            next(createError.Conflict(error.message));
+    const resData = {};
+    const listTypeLine = [];
+    try {
+      const dataFileTypeLine = fs.createReadStream(csvFileTypeLinePath, "utf8");
+      dataFileTypeLine
+        .pipe(stripBomStream())
+        .pipe(csv())
+        .on("headers", (headers) => {
+          if (headers.length > 0) {
+            headers.shift();
+          }
+          headers.forEach((element) => {
+            listTypeLine.push({ name: element });
           });
-      } catch (error) {
-        next(createError.InternalServerError(error.message));
-      }
-    } else {
-      next(createError.NotFound(`File not found: ${fileName}`));
+        })
+        .on("data", (data) => {})
+        .on("end", () => {
+          listTypeLine.forEach((line) => {
+            resData[line.name] = [];
+          });
+          const dataFile = fs.createReadStream(csvFilePath, "utf8");
+          dataFile
+            .pipe(stripBomStream())
+            .pipe(csv())
+            .on("data", (row) => {
+              for (const line of listTypeLine) {
+                if (row.line === line.name) {
+                  resData[line.name].push({ name: row.Load_scale });
+                }
+              }
+            })
+            .on("end", () => {
+              resForm.successRes(res, resData);
+            })
+            .on("error", (error) => {
+              next(createError.Conflict(error.message));
+            });
+        })
+        .on("error", (error) => {
+          next(createError.Conflict(error.message));
+        });
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
     }
   },
 };
