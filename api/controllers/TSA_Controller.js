@@ -196,52 +196,31 @@ const TSA_Contrl = {
     }
   },
 
-  listlLine: async (req, res, next) => {
-    const csvFileTypeLinePath = `File/TSA/TransferCapacity.csv`;
+  listlLineWithType: async (req, res, next) => {
     const csvFilePath = `File/TSA/chart/results.csv`;
-    if (!fs.existsSync(csvFileTypeLinePath)) {
-      return next(createError.NotFound("File not found"));
-    }
     if (!fs.existsSync(csvFilePath)) {
       return next(createError.NotFound("File not found"));
     }
-    const resData = {};
-    const listTypeLine = [];
     try {
-      const dataFileTypeLine = fs.createReadStream(csvFileTypeLinePath, "utf8");
-      dataFileTypeLine
+      const typeLine = req.params._typeLine;
+      const resData = {
+        name: typeLine,
+        data: [],
+      };
+      const dataFile = fs.createReadStream(csvFilePath, "utf8");
+      dataFile
         .pipe(stripBomStream())
         .pipe(csv())
-        .on("headers", (headers) => {
-          if (headers.length > 0) {
-            headers.shift();
+        .on("data", (row) => {
+          if (row.line === typeLine) {
+            resData.data.push({ name: row.Load_scale });
           }
-          headers.forEach((element) => {
-            listTypeLine.push({ name: element });
-          });
         })
-        .on("data", (data) => {})
         .on("end", () => {
-          listTypeLine.forEach((line) => {
-            resData[line.name] = [];
+          resData.data.sort(function (a, b) {
+            return parseFloat(a.name) - parseFloat(b.name);
           });
-          const dataFile = fs.createReadStream(csvFilePath, "utf8");
-          dataFile
-            .pipe(stripBomStream())
-            .pipe(csv())
-            .on("data", (row) => {
-              for (const line of listTypeLine) {
-                if (row.line === line.name) {
-                  resData[line.name].push({ name: row.Load_scale });
-                }
-              }
-            })
-            .on("end", () => {
-              resForm.successRes(res, resData);
-            })
-            .on("error", (error) => {
-              next(createError.Conflict(error.message));
-            });
+          resForm.successRes(res, resData);
         })
         .on("error", (error) => {
           next(createError.Conflict(error.message));

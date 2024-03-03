@@ -558,7 +558,6 @@ const DSA_Contrl = {
             .pipe(stripBomStream())
             .pipe(csv())
             .on("data", (row) => {
-              console.log(row, "row");
               const subDetail = {
                 name: row.Line,
                 value: parseFloat(row.Value),
