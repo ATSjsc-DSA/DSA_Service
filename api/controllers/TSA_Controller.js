@@ -130,23 +130,26 @@ const TSA_Contrl = {
         },
         zone2: { curent: "", pv: "", tsat: "" },
       };
-
+      let headersList = [];
       const dataFile = fs.createReadStream(csvFilePath, "utf8");
       dataFile
         .pipe(stripBomStream())
         .pipe(csv())
+        .on("headers", (headers) => {
+          headersList = headers;
+        })
         .on("data", (row) => {
           if (row.Ref === "Current") {
-            resData.zone1.curent = parseFloat(row["Area1-Area2"]);
-            resData.zone2.curent = parseFloat(row["Area2-Area3"]);
+            resData.zone1.curent = parseFloat(row[headersList[1]]);
+            resData.zone2.curent = parseFloat(row[headersList[2]]);
           }
           if (row.Ref === "PV_Limitation") {
-            resData.zone1.pv = parseFloat(row["Area1-Area2"]);
-            resData.zone2.pv = parseFloat(row["Area2-Area3"]);
+            resData.zone1.pv = parseFloat(row[headersList[1]]);
+            resData.zone2.pv = parseFloat(row[headersList[2]]);
           }
           if (row.Ref === "TSAT_Limitation") {
-            resData.zone1.tsat = parseFloat(row["Area1-Area2"]);
-            resData.zone2.tsat = parseFloat(row["Area2-Area3"]);
+            resData.zone1.tsat = parseFloat(row[headersList[1]]);
+            resData.zone2.tsat = parseFloat(row[headersList[2]]);
           }
         })
         .on("end", () => {
