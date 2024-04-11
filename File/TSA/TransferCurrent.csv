@@ -1,4 +1,4 @@
-Ref,Area1-Area2,Area2-Area3
-Thermal_Current,554.6593147,2610
-PV_Current,554.6593147,2610
-TSAT_Current,554.6593147,2610
+Ref,North-Central,Central-South
+Thermal_Current,1741,1670
+PV_Current,1741,1670
+TSAT_Current,1741,1670

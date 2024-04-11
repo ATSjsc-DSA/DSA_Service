@@ -28,6 +28,20 @@ const getDataFromFile = (filePath, filterKey, filterValue) => {
   });
 };
 
+const findMaxDifference = (columnDifferences) => {
+  let maxDifference = -Infinity;
+  let maxColumnName = null;
+
+  for (const [columnName, difference] of Object.entries(columnDifferences)) {
+    if (difference > maxDifference) {
+      maxDifference = difference;
+      maxColumnName = columnName;
+    }
+  }
+
+  return { columnName: maxColumnName, difference: maxDifference };
+};
+
 const SSR_Contrl = {
   get: (req, res, next) => {
     res.send("Hello World!");
@@ -109,12 +123,17 @@ const SSR_Contrl = {
         .pipe(stripBomStream())
         .pipe(csv())
         .on("data", (row) => {
+          console.log(row);
           for (const key in row) {
             if (Object.prototype.hasOwnProperty.call(row, key)) {
               const value = row[key];
-              const floatValue = parseFloat(value);
-              if (!isNaN(floatValue)) {
-                row[key] = floatValue;
+              if (value === "") {
+                row[key] = 0;
+              } else {
+                const floatValue = parseFloat(value);
+                if (!isNaN(floatValue)) {
+                  row[key] = floatValue;
+                }
               }
             }
           }
@@ -137,22 +156,55 @@ const SSR_Contrl = {
       return next(createError.NotFound("File not found"));
     }
     try {
-      const resData = [];
-
+      const resData = {
+        list: [],
+        busbarMAx: {
+          name: "",
+        },
+      };
+      const a = [];
+      const columnFirstValues = {}; // Lưu giá trị đầu tiên của mỗi cột
+      const columnLastValues = {}; // Lưu giá trị cuối cùng của mỗi cột
+      const columnDifferences = {}; // Để lưu trữ hiệu của các cột
+      const rowWithoutFirstColumn = {};
       const dataFile = fs.createReadStream(csvFilePath, "utf8");
       dataFile
         .pipe(stripBomStream())
         .pipe(csv())
         .on("headers", (headers) => {
-          if (headers.length > 0) {
-            headers.shift();
-          }
+          // if (headers.length > 0) {
+          //   headers.shift();
+          // }
           headers.forEach((element) => {
-            resData.push({ name: element });
+            if (element !== "Base Case") {
+              resData.list.push({ name: element });
+            }
           });
         })
-        .on("data", (row) => {})
+        .on("data", (row) => {
+          for (const [columnName, columnValue] of Object.entries(row)) {
+            if (columnName !== "Base Case") {
+              if (!columnFirstValues[columnName]) {
+                columnFirstValues[columnName] = parseFloat(columnValue);
+              }
+              // Luôn cập nhật giá trị cuối cùng của cột, ngoại trừ cột 'Base Case'
+              columnLastValues[columnName] = parseFloat(columnValue);
+            }
+          }
+        })
         .on("end", () => {
+          for (const [columnName, firstValue] of Object.entries(
+            columnFirstValues
+          )) {
+            const lastValue = columnLastValues[columnName];
+            // Tính hiệu
+            const difference = firstValue - lastValue;
+            // Lưu hiệu vào đối tượng columnDifferences
+            columnDifferences[columnName] = difference;
+          }
+          const maxDifference = findMaxDifference(columnDifferences);
+          resData.busbarMAx.name = maxDifference.columnName;
+          // Gửi phản hồi thành công nếu cần
           resForm.successRes(res, resData);
         })
         .on("error", (error) => {
