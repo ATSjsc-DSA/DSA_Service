@@ -123,7 +123,6 @@ const SSR_Contrl = {
         .pipe(stripBomStream())
         .pipe(csv())
         .on("data", (row) => {
-          console.log(row);
           for (const key in row) {
             if (Object.prototype.hasOwnProperty.call(row, key)) {
               const value = row[key];

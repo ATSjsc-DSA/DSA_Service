@@ -7,6 +7,7 @@ import createError from "http-errors";
 import { createObjectCsvWriter } from "csv-writer"; // Thêm thư viện csv-writer
 import getFileModificationTimeUtc from "../../common/fileHandler.js";
 import { log } from "util";
+import { variable, changeVariable } from "../../common/handle.js";
 
 const DSA_Contrl = {
   logs: async (req, res, next) => {
@@ -192,7 +193,16 @@ const DSA_Contrl = {
           resData.data.Rate1.push(parseFloat(row["Rate 1 (Green)"]));
           resData.data.Rate2.push(parseFloat(row["Rate 2 (Yellow)"]));
           resData.data.Rate3.push(parseFloat(row["Rate 3 (Red)"]));
-          resData.data.CurentState.push(parseFloat(row["Curent State"]));
+          if (
+            row["Unnamed: 0"] === "VSA Module" ||
+            row["Unnamed: 0"] === "TSA Module"
+          ) {
+            resData.data.CurentState.push(
+              parseFloat(row["Curent State"]) * (1 + variable)
+            );
+          } else {
+            resData.data.CurentState.push(parseFloat(row["Curent State"]));
+          }
         })
         .on("end", () => {
           resForm.successRes(res, resData);

@@ -5,6 +5,7 @@ import csv from "csv-parser";
 import resForm from "../../common/response.js";
 import createError from "http-errors";
 import getFileModificationTimeUtc from "../../common/fileHandler.js";
+import { variable, changeVariable } from "../../common/handle.js";
 
 const processCsvFile = async (filePath, lineName, resData) => {
   if (fs.existsSync(filePath)) {
@@ -15,7 +16,13 @@ const processCsvFile = async (filePath, lineName, resData) => {
         .pipe(csv())
         .on("data", (row) => {
           resData.Key.push(row.Ref);
-          resData.data.value.push(parseFloat(row[lineName]));
+          if (row.Ref.includes("Current")) {
+            resData.data.value.push(
+              parseFloat(row[lineName]) + parseFloat(row[lineName]) * variable
+            );
+          } else {
+            resData.data.value.push(parseFloat(row[lineName]));
+          }
         })
         .on("end", resolve)
         .on("error", reject);
@@ -85,7 +92,6 @@ const TSA_Contrl = {
     const baseFilePath = "File/TSA/";
     const csvFilePath = `${baseFilePath}TransferCapacity.csv`;
     const csvFileCurrentPath = `${baseFilePath}TransferCurrent.csv`;
-
     try {
       const filesExist = [csvFilePath, csvFileCurrentPath].every((filePath) =>
         fs.existsSync(filePath)
@@ -105,6 +111,7 @@ const TSA_Contrl = {
       resData.modificationTime = await getFileModificationTimeUtc(csvFilePath);
 
       await processCsvFile(csvFilePath, lineName, resData);
+      changeVariable();
       await processCsvFile(csvFileCurrentPath, lineName, resData);
 
       resForm.successRes(res, resData);
@@ -140,8 +147,12 @@ const TSA_Contrl = {
         })
         .on("data", (row) => {
           if (row.Ref === "Current") {
-            resData.zone1.curent = parseFloat(row[headersList[1]]);
-            resData.zone2.curent = parseFloat(row[headersList[2]]);
+            resData.zone1.curent =
+              parseFloat(row[headersList[1]]) +
+              parseFloat(row[headersList[1]]) * variable;
+            resData.zone2.curent =
+              parseFloat(row[headersList[2]]) +
+              parseFloat(row[headersList[2]]) * variable;
           }
           if (row.Ref === "PV_Limitation") {
             resData.zone1.pv = parseFloat(row[headersList[1]]);
