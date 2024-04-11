@@ -15,7 +15,7 @@ const processCsvFile = async (filePath, lineName, resData) => {
         .pipe(csv())
         .on("data", (row) => {
           resData.Key.push(row.Ref);
-          resData.data.value.push(row[lineName]);
+          resData.data.value.push(parseFloat(row[lineName]));
         })
         .on("end", resolve)
         .on("error", reject);
@@ -108,6 +108,53 @@ const TSA_Contrl = {
       await processCsvFile(csvFileCurrentPath, lineName, resData);
 
       resForm.successRes(res, resData);
+    } catch (error) {
+      next(createError.InternalServerError(error.message));
+    }
+  },
+  transferCapacity: async (req, res, next) => {
+    const lineName = req.params._line;
+    const baseFilePath = "File/TSA/";
+    const csvFilePath = `${baseFilePath}TransferCapacity.csv`;
+
+    try {
+      if (!fs.existsSync(csvFilePath)) {
+        return next(createError.NotFound("File not found"));
+      }
+
+      const resData = {
+        zone1: {
+          curent: "",
+          pv: "",
+          tsat: "",
+        },
+        zone2: { curent: "", pv: "", tsat: "" },
+      };
+
+      const dataFile = fs.createReadStream(csvFilePath, "utf8");
+      dataFile
+        .pipe(stripBomStream())
+        .pipe(csv())
+        .on("data", (row) => {
+          if (row.Ref === "Current") {
+            resData.zone1.curent = parseFloat(row["Area1-Area2"]);
+            resData.zone2.curent = parseFloat(row["Area2-Area3"]);
+          }
+          if (row.Ref === "PV_Limitation") {
+            resData.zone1.pv = parseFloat(row["Area1-Area2"]);
+            resData.zone2.pv = parseFloat(row["Area2-Area3"]);
+          }
+          if (row.Ref === "TSAT_Limitation") {
+            resData.zone1.tsat = parseFloat(row["Area1-Area2"]);
+            resData.zone2.tsat = parseFloat(row["Area2-Area3"]);
+          }
+        })
+        .on("end", () => {
+          resForm.successRes(res, resData);
+        })
+        .on("error", (error) => {
+          next(createError.Conflict(error.message));
+        });
     } catch (error) {
       next(createError.InternalServerError(error.message));
     }

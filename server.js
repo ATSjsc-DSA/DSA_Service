@@ -13,6 +13,8 @@ import routes from "./routes/routes.js"; //importing route
 // require("./helpers/connections_mongodb");
 
 //csv
+//swagger
+import swaggerDocs from "./swagger.js";
 
 const app = express();
 
@@ -48,6 +50,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(port);
+app.listen(port, () => {
+  console.log(`swaggerDocs app listening at http://localhost:${port}`);
+
+  swaggerDocs(app, port);
+});
 
 console.log("RESTful API server started on: " + port);
